@@ -32,10 +32,20 @@ Open `index.html` directly, or serve the folder locally:
 ```sh
 npm run check
 npm test
+npm run verify:browser
 python3 -m http.server 5212
 ```
 
 Then visit `http://localhost:5212/`.
+
+For the full local release check, run:
+
+```sh
+npm run validate
+git diff --check
+```
+
+`npm run verify:browser` starts a temporary local server, opens headless Chrome at desktop and `390 x 844` mobile sizes, starts a relay, taps the active lane, captures screenshots, and fails if the page has obvious horizontal overflow.
 
 ## Core gameplay
 

@@ -5,7 +5,9 @@
   "private": false,
   "scripts": {
     "check": "node scripts/check.js",
-    "test": "node scripts/test-core.js"
+    "test": "node scripts/test-core.js",
+    "verify:browser": "node scripts/verify-browser.mjs",
+    "validate": "npm run check && npm test && npm run verify:browser"
   },
   "keywords": [
     "browser-game",
