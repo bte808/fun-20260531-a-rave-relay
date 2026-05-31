@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta
+      name="description"
+      content="Rave Relay is a tiny browser rhythm sprint about catching colorful pulses on four lanes."
+    >
+    <title>Rave Relay</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23141414'/%3E%3Ccircle cx='18' cy='34' r='8' fill='%23ff5a5f'/%3E%3Ccircle cx='32' cy='24' r='8' fill='%2300b8a9'/%3E%3Ccircle cx='46' cy='34' r='8' fill='%23f9d423'/%3E%3Cpath d='M14 47h36' stroke='%23ffffff' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E">
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Daily micro rhythm game</p>
+          <h1>Rave Relay</h1>
+        </div>
+        <div class="day-pill" id="day-pill">Shanghai daily</div>
+      </header>
+
+      <section class="game-board" aria-labelledby="score-title">
+        <div class="scorebar" id="score-title">
+          <div class="meter-block">
+            <span>Score</span>
+            <strong id="score">0</strong>
+          </div>
+          <div class="meter-block">
+            <span>Combo</span>
+            <strong id="combo">0x</strong>
+          </div>
+          <div class="meter-block">
+            <span>Hits</span>
+            <strong id="hits">0/18</strong>
+          </div>
+          <div class="hype-wrap" aria-label="Hype meter">
+            <span>Hype</span>
+            <div class="hype-track">
+              <div class="hype-fill" id="hype-fill"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stage" id="stage" aria-live="polite">
+          <div class="stage-status">
+            <span id="round-label">Pulse 0 / 18</span>
+            <strong id="feedback">Ready</strong>
+          </div>
+
+          <div class="lanes" id="lanes">
+            <div class="lane" data-lane="0">
+              <button class="lane-pad" type="button" data-lane-button="0" aria-label="Catch bass lane">
+                <span>Q</span>
+                <strong>Bass</strong>
+              </button>
+              <div class="lane-track" aria-hidden="true">
+                <div class="target-ring"></div>
+                <div class="signal"></div>
+              </div>
+            </div>
+            <div class="lane" data-lane="1">
+              <button class="lane-pad" type="button" data-lane-button="1" aria-label="Catch beam lane">
+                <span>W</span>
+                <strong>Beam</strong>
+              </button>
+              <div class="lane-track" aria-hidden="true">
+                <div class="target-ring"></div>
+                <div class="signal"></div>
+              </div>
+            </div>
+            <div class="lane" data-lane="2">
+              <button class="lane-pad" type="button" data-lane-button="2" aria-label="Catch spark lane">
+                <span>E</span>
+                <strong>Spark</strong>
+              </button>
+              <div class="lane-track" aria-hidden="true">
+                <div class="target-ring"></div>
+                <div class="signal"></div>
+              </div>
+            </div>
+            <div class="lane" data-lane="3">
+              <button class="lane-pad" type="button" data-lane-button="3" aria-label="Catch echo lane">
+                <span>R</span>
+                <strong>Echo</strong>
+              </button>
+              <div class="lane-track" aria-hidden="true">
+                <div class="target-ring"></div>
+                <div class="signal"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="controls">
+          <button class="primary-action" id="start-button" type="button">Start relay</button>
+          <button class="icon-action" id="sound-button" type="button" aria-pressed="false">Sound off</button>
+          <button class="icon-action" id="copy-button" type="button" disabled>Copy score</button>
+        </div>
+
+        <section class="result-panel" id="result-panel" hidden>
+          <div>
+            <span class="result-kicker">Final grade</span>
+            <strong id="grade">--</strong>
+          </div>
+          <p id="result-copy"></p>
+        </section>
+      </section>
+    </main>
+
+    <script src="game.js"></script>
+  </body>
+</html>
