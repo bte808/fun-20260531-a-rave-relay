@@ -13,6 +13,8 @@
     "browser-game",
     "rhythm-game",
     "daily-game",
+    "replay-seed",
+    "shareable-challenge",
     "no-dependencies",
     "javascript"
   ],

@@ -6,9 +6,12 @@ const {
   ROUND_SIZE,
   buildSetlist,
   gradeRun,
+  isValidDateString,
+  resolveChallengeDate,
   scoreTap,
   seedFromString,
-  shareText
+  shareText,
+  withDateParam
 } = require("../game.js");
 
 const today = "2026-05-31";
@@ -35,6 +38,15 @@ for (let index = 2; index < setlist.length; index += 1) {
 
 assert.equal(seedFromString("same"), seedFromString("same"), "hash seed is stable");
 assert.notEqual(seedFromString("same"), seedFromString("other"), "hash seed changes with input");
+
+assert.equal(isValidDateString("2026-05-31"), true, "valid challenge date is accepted");
+assert.equal(isValidDateString("2026-02-31"), false, "impossible challenge date is rejected");
+assert.equal(resolveChallengeDate("?date=2026-05-31", "2026-06-04"), "2026-05-31");
+assert.equal(resolveChallengeDate("?date=bad", "2026-06-04"), "2026-06-04");
+assert.equal(
+  withDateParam("https://example.com/rave/?foo=1#score", "2026-05-31"),
+  "https://example.com/rave/?foo=1&date=2026-05-31"
+);
 
 const perfect = scoreTap(true, 20, 2);
 assert.equal(perfect.kind, "perfect");

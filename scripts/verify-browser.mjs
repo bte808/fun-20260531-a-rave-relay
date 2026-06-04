@@ -5,6 +5,7 @@ import { dirname, join } from "node:path";
 
 const port = Number(process.env.RAVE_RELAY_PORT || 5212);
 const targetUrl = process.env.RAVE_RELAY_URL || `http://127.0.0.1:${port}/`;
+const challengeDate = "2026-05-31";
 const chromePath =
   process.env.CHROME_PATH ||
   "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
@@ -175,8 +176,10 @@ async function runViewportCheck(cdp, viewport) {
     sessionId
   );
 
+  const viewportUrl = new URL(targetUrl);
+  viewportUrl.searchParams.set("date", challengeDate);
   const loaded = cdp.waitFor("Page.loadEventFired", sessionId);
-  await cdp.send("Page.navigate", { url: targetUrl }, sessionId);
+  await cdp.send("Page.navigate", { url: viewportUrl.href }, sessionId);
   await loaded;
 
   const details = await evaluate(
@@ -184,26 +187,45 @@ async function runViewportCheck(cdp, viewport) {
     sessionId,
     `new Promise((resolve) => {
       const startButton = document.querySelector('#start-button');
-      startButton.click();
+      const challengeButton = document.querySelector('#challenge-button');
+      try {
+        Object.defineProperty(navigator, 'clipboard', {
+          configurable: true,
+          value: {
+            writeText: async (value) => {
+              window.__raveRelayCopiedText = value;
+            }
+          }
+        });
+      } catch (error) {}
+      challengeButton.click();
       setTimeout(() => {
-        const activeLane = document.querySelector('.lane.is-active');
-        const laneIndex = activeLane ? activeLane.dataset.lane : '0';
-        document.querySelector('[data-lane-button="' + laneIndex + '"]').click();
+        const challengeFeedback = document.querySelector('#feedback').textContent.trim();
+        startButton.click();
         setTimeout(() => {
-          const startRect = startButton.getBoundingClientRect();
-          resolve({
-            title: document.title,
-            laneCount: document.querySelectorAll('.lane').length,
-            feedback: document.querySelector('#feedback').textContent.trim(),
-            roundLabel: document.querySelector('#round-label').textContent.trim(),
-            scoreText: document.querySelector('#score').textContent.trim(),
-            copyDisabled: document.querySelector('#copy-button').disabled,
-            resultHidden: document.querySelector('#result-panel').hidden,
-            overflow: Math.max(0, document.documentElement.scrollWidth - document.documentElement.clientWidth),
-            startVisible: startRect.top >= 0 && startRect.bottom <= window.innerHeight
-          });
-        }, 120);
-      }, 520);
+          const activeLane = document.querySelector('.lane.is-active');
+          const laneIndex = activeLane ? activeLane.dataset.lane : '0';
+          document.querySelector('[data-lane-button="' + laneIndex + '"]').click();
+          setTimeout(() => {
+            const startRect = startButton.getBoundingClientRect();
+            resolve({
+              title: document.title,
+              dayText: document.querySelector('#day-pill').textContent.trim(),
+              laneCount: document.querySelectorAll('.lane').length,
+              challengeButtonText: challengeButton.textContent.trim(),
+              challengeFeedback,
+              challengeCopiedText: window.__raveRelayCopiedText || '',
+              feedback: document.querySelector('#feedback').textContent.trim(),
+              roundLabel: document.querySelector('#round-label').textContent.trim(),
+              scoreText: document.querySelector('#score').textContent.trim(),
+              copyDisabled: document.querySelector('#copy-button').disabled,
+              resultHidden: document.querySelector('#result-panel').hidden,
+              overflow: Math.max(0, document.documentElement.scrollWidth - document.documentElement.clientWidth),
+              startVisible: startRect.top >= 0 && startRect.bottom <= window.innerHeight
+            });
+          }, 120);
+        }, 520);
+      }, 100);
     })`
   );
 
@@ -223,7 +245,11 @@ async function runViewportCheck(cdp, viewport) {
 
   const ok =
     details.title === "Rave Relay" &&
+    details.dayText === challengeDate &&
     details.laneCount === 4 &&
+    details.challengeButtonText === "Copy challenge" &&
+    details.challengeFeedback === "challenge copied" &&
+    details.challengeCopiedText.includes(`date=${challengeDate}`) &&
     ["Pulse 1 / 18", "Pulse 2 / 18"].includes(details.roundLabel) &&
     details.feedback.length > 0 &&
     details.copyDisabled &&

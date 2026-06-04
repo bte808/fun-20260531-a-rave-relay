@@ -11,17 +11,19 @@ It is built as a static, dependency-free HTML/CSS/JavaScript game so it opens in
 - A full run is 18 pulses, so one attempt takes less than a minute.
 - The daily setlist is deterministic, which makes scores easy to compare.
 - Timing grades, combo bonuses, a hype meter, local best score, and copyable results make repeat plays feel worthwhile.
+- Seeded challenge links make any date replayable with `?date=YYYY-MM-DD`.
 - It supports mouse, touch, and Q/W/E/R keyboard play without login, install steps, or remote services.
 
 ## Why it may be worth a star
 
-Rave Relay is small enough to read in one sitting but polished enough to share: no build stack, no external art, no accounts, responsive layout, deterministic daily content, and a clear score loop. It is a reusable pattern for tiny web games that feel complete instead of prototype-shaped.
+Rave Relay is small enough to read in one sitting but polished enough to share: no build stack, no external art, no accounts, responsive layout, deterministic daily content, copyable challenge links, and a clear score loop. It is a reusable pattern for tiny web games that feel complete instead of prototype-shaped.
 
 ## What it can do
 
 - Start a daily seeded 18-pulse relay.
 - Score taps as perfect, nice, catch, miss, or wrong lane.
 - Track score, combo, hits, hype, grade, and local best score.
+- Copy the current daily challenge link before playing.
 - Copy a compact result string for sharing.
 - Play optional synthesized tones after a user gesture.
 
@@ -38,6 +40,12 @@ python3 -m http.server 5212
 
 Then visit `http://localhost:5212/`.
 
+Replay or share a specific setlist with `?date=YYYY-MM-DD`, for example:
+
+```text
+https://bte808.github.io/fun-20260531-a-rave-relay/?date=2026-05-31
+```
+
 For the full local release check, run:
 
 ```sh
@@ -52,7 +60,7 @@ git diff --check
 1. Press **Start relay**.
 2. Catch the active lane pulse when it crosses the bright ring.
 3. Build combo by landing clean hits.
-4. Finish all 18 pulses and copy the final score.
+4. Copy the date challenge before a run, or finish all 18 pulses and copy the final score.
 
 Lane controls:
 
@@ -67,7 +75,6 @@ The idea came from browsing recent public web inspiration around tiny browser-fi
 
 ## Future extensions
 
-- Add seeded challenge links.
 - Add an optional hard mode with narrower timing windows.
 - Add a visual replay strip for missed pulses.
 - Add more audio voices while keeping the no-asset approach.

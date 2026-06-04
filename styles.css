@@ -319,7 +319,7 @@ h1 {
 
 .controls {
   display: grid;
-  grid-template-columns: minmax(170px, 1fr) minmax(130px, auto) minmax(130px, auto);
+  grid-template-columns: minmax(170px, 1fr) repeat(3, minmax(132px, auto));
   gap: 10px;
 }
 

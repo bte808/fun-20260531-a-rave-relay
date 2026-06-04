@@ -47,6 +47,25 @@
     return formatter.format(now || new Date());
   }
 
+  function isValidDateString(value) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(value || "")) return false;
+    const date = new Date(`${value}T00:00:00Z`);
+    return !Number.isNaN(date.valueOf()) && date.toISOString().slice(0, 10) === value;
+  }
+
+  function resolveChallengeDate(search, fallback) {
+    const params = new URLSearchParams(search || "");
+    const requested = params.get("date");
+    return isValidDateString(requested) ? requested : fallback;
+  }
+
+  function withDateParam(baseUrl, dateString) {
+    const url = new URL(baseUrl);
+    url.searchParams.set("date", dateString);
+    url.hash = "";
+    return url.href;
+  }
+
   function buildSetlist(dateString, count) {
     const total = count || ROUND_SIZE;
     const random = mulberry32(seedFromString(`rave-relay:${dateString}`));
@@ -142,10 +161,13 @@
     buildSetlist,
     clamp,
     gradeRun,
+    isValidDateString,
     scoreTap,
     seedFromString,
+    resolveChallengeDate,
     shanghaiDateString,
-    shareText
+    shareText,
+    withDateParam
   };
 
   if (typeof module !== "undefined" && module.exports) {
@@ -167,6 +189,7 @@
     feedback: document.getElementById("feedback"),
     startButton: document.getElementById("start-button"),
     soundButton: document.getElementById("sound-button"),
+    challengeButton: document.getElementById("challenge-button"),
     copyButton: document.getElementById("copy-button"),
     resultPanel: document.getElementById("result-panel"),
     grade: document.getElementById("grade"),
@@ -176,7 +199,7 @@
   };
 
   const state = {
-    date: shanghaiDateString(new Date()),
+    date: resolveChallengeDate(root.location.search, shanghaiDateString(new Date())),
     setlist: [],
     mode: "ready",
     index: 0,
@@ -197,6 +220,10 @@
     audio: null,
     lastShare: ""
   };
+
+  function challengeUrl() {
+    return withDateParam(root.location.href, state.date);
+  }
 
   function renderStats() {
     refs.dayPill.textContent = state.date;
@@ -392,7 +419,7 @@
 
   async function copyScore() {
     if (!state.lastShare) return;
-    const text = `${state.lastShare} ${root.location.href}`;
+    const text = `${state.lastShare} ${challengeUrl()}`;
     try {
       await root.navigator.clipboard.writeText(text);
     } catch (error) {
@@ -409,6 +436,24 @@
     setFeedback("score copied");
   }
 
+  async function copyChallenge() {
+    const text = `Rave Relay ${state.date} challenge: ${challengeUrl()}`;
+    try {
+      await root.navigator.clipboard.writeText(text);
+    } catch (error) {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.setAttribute("readonly", "");
+      textarea.style.position = "fixed";
+      textarea.style.left = "-9999px";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      textarea.remove();
+    }
+    setFeedback("challenge copied");
+  }
+
   refs.startButton.addEventListener("click", () => {
     resetRound();
     state.timer = root.setTimeout(nextPulse, 300);
@@ -422,6 +467,7 @@
   });
 
   refs.copyButton.addEventListener("click", copyScore);
+  refs.challengeButton.addEventListener("click", copyChallenge);
 
   document.querySelectorAll("[data-lane-button]").forEach((button) => {
     button.addEventListener("click", () => handleLane(Number(button.dataset.laneButton)));
